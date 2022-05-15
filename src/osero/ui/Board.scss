@@ -1,0 +1,23 @@
+.BoardView {
+    padding: 1rem;
+  table {
+    border-collapse: collapse;
+  }
+  td {
+    border: 0.4rem solid black;
+    width: 8rem;
+    height: 8rem;
+    background-color: green;
+    vertical-align: bottom;
+
+    .CellInnerContainer {
+      display: flex;
+      padding: 0.2rem;
+      // justify-content: center;
+      // align-items: center;
+    }
+    &.DiskEmpty {
+      cursor: pointer;
+    }
+  }
+}

@@ -1,29 +1,13 @@
-import { useEffect, useState } from "react";
-import { Board, genBoard, genBoardId, sampleRun } from "./core/board";
-import { BoardView } from "./ui/BoardView";
+import { useState } from "react";
+import { Game } from "./core/game";
+import { GameView } from "./ui/GameView";
 
 export const OseroPage = () => {
-  const boardId = genBoardId();
-  const [board, setBoard] = useState<Board>(genBoard({ boardId, nCells: 8}));
-  useEffect(() => {
-    // const componentSeed = Math.random();
-    setTimeout(sampleRun, 1 * 1000);
-  }, []);
+  const [game, setGame] = useState<Game>(Game.new());
 
   return (
     <>
-      <div>{board && <BoardView board={board}/>}</div>
-
-      <p>成績表</p>
-      <table>
-        <tbody>
-          <tr>
-            <td></td>
-          </tr>
-
-        </tbody>
-
-      </table>
+      <div>{game && <GameView game={game}/>}</div>
     </>
   );
 };
