@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Game } from "./core/game";
+import { useRecoilState } from "recoil";
+import { defaultGameState } from "./state/gameState";
 import { GameView } from "./ui/GameView";
 
 export const OseroPage = () => {
-  const [game, setGame] = useState<Game>(Game.new());
+  const [defaultGame, _] = useRecoilState(defaultGameState);
 
   return (
     <>
-      <div>{game && <GameView game={game}/>}</div>
+      <div>{defaultGame && <GameView game={defaultGame} />}</div>
     </>
   );
 };

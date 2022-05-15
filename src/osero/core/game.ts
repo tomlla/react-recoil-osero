@@ -1,39 +1,63 @@
-import { Board, Pos } from "./board";
+import { Board } from "./board";
 import { Disk } from "./disk";
+import { reversibleCells } from "./diskReverse";
+import { Pos } from "./pos";
 
 export const genGameId = (): string => Math.random().toString().slice(2, 14);
 
-type Player = "Black" | "White";
-type Command = "Pass" | { pos: Pos; disk: Disk };
+export type Player = Disk.Black | Disk.White;
+export type PlayerDisk = Player;
+type Command = "Pass" | Pos;
 
 interface Turn {
   player: Player;
-  command: Command;
+  cmd: Command;
+  timestamp: Date;
 }
 
 export class Game {
-  history: (Turn & { timestamp: Date })[];
-  startedAt: Date;
-
   public static new() {
-    // const genGameId();
-    const board = Board.gen({ nCells: 8 });
+    const board = Board.new({ nCells: 8 });
     return new Game(board);
   }
-  constructor(public readonly board: Board, public player: Player = "Black") {
-    this.startedAt = new Date();
-    this.history = [];
+
+  constructor(
+    public board: Board,
+    public player: Player = Disk.Black,
+    public startedAt: Date = new Date(),
+    public histories: Turn[] = []
+  ) {}
+
+  public clone(): Game {
+    return new Game(
+      //
+      this.board.clone(),
+      this.player,
+      this.startedAt,
+      [...this.histories]
+    );
   }
 
-  public apply(turn: Turn) {
-    if (turn.command !== "Pass") {
-      this.board.setDisk(turn.command.pos, turn.command.disk);
+  public withCmd(cmd: Command) {
+    const timestamp = new Date();
+    const game = this.clone();
+
+    if (cmd !== "Pass") {
+      game.board.putDisk(cmd, this.player);
+      const op = { pos: cmd, disk: this.player };
+      const reverseTargets = reversibleCells(game.board, op);
+      console.log({ reverseTargets });
+      reverseTargets.forEach((pos) => {
+        game.board.reverse(pos, this.player);
+      });
     }
-    this.history.push({ ...turn, timestamp: new Date() });
-    this.letPlayerChange();
+    const history = { player: this.player, cmd, timestamp };
+    game.player = this.nextPlayer();
+    game.histories.push(history);
+    return game;
   }
 
-  private letPlayerChange() {
-    this.player = this.player === "Black" ? "White" : "Black";
+  private nextPlayer() {
+    return this.player === Disk.Black ? Disk.White : Disk.Black;
   }
 }

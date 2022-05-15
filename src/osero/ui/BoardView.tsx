@@ -1,7 +1,10 @@
 import "./Board.scss";
 import { times } from "../../utils/times";
-import { Board, Pos } from "../core/board";
+import { Board } from "../core/board";
 import { Disk } from "../core/disk";
+import { useRecoilState } from "recoil";
+import { defaultGameState } from "../state/gameState";
+import { Pos } from "../core/pos";
 
 export const BoardView: React.FC<{ board: Board }> = ({ board }) => {
   const N = board.nCells;
@@ -38,11 +41,15 @@ const diskClassName = (disk: Disk): string => {
 
 const Cell: React.FC<{ board: Board; pos: Pos }> = ({ board, pos }) => {
   const disk = board.getCell(pos);
-  const setDisk = () => {
-    board.setDisk(pos, Disk.Black);
+  const [defaultGame, setDefaultGame] = useRecoilState(defaultGameState);
+  const onClick = () => {
+    if (defaultGame.board.getCell(pos) === Disk.Empty) {
+      const game = defaultGame.withCmd(pos);
+      setDefaultGame(game);
+    }
   };
   return (
-    <td key={pos.x} className={diskClassName(disk)} onClick={setDisk}>
+    <td key={pos.x} className={diskClassName(disk)} onClick={onClick}>
       <div className="CellInnerContainer">{diskSvg(disk)}</div>
     </td>
   );
